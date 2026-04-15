@@ -214,3 +214,5 @@ data/processed/
 # Added files
 doc/
 .DS_Store
+.vscode/
+

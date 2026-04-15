@@ -1,0 +1,6 @@
+requests
+python-dotenv
+beautifulsoup4
+ipumspy
+pandas
+numpy
