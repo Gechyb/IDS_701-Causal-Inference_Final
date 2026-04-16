@@ -31,13 +31,8 @@ Sources:
 State selection for the border-county analysis is intentionally left to a separate script.
 """
 
-import os
 import requests
 from pathlib import Path
-from dotenv import load_dotenv
-
-# Load API keys from .env file (never committed to git)
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 # Paths
 ROOT = Path(__file__).resolve().parents[1]
@@ -206,90 +201,33 @@ def download_min_wage() -> None:
     print(f"  [saved] {dest.name} ({len(rows)} rows, {len(ALL_STATE_ABBRS)} states)")
 
 
-# 3. IPUMS CPS (Current Population Survey)
-# Used for the secondary heterogeneity analysis (employment by age and gender).
+# 3. IPUMS CPS (Current Population Survey) — MANUALLY DOWNLOADED
+# Used for the secondary heterogeneity analysis (employment effects by age and gender).
 # We use the March ASEC supplement (the richest annual labor market data in CPS)
 # for 2010–2024, covering all states.
 #
-# Variables requested:
-#   YEAR, MONTH, SERIAL, PERNUM  — identifiers
-#   WTFINL                        — person weight
-#   STATEFIP                      — state FIPS code
-#   AGE, SEX                      — demographics
-#   EMPSTAT, LABFORCE             — employment / labor force status
-#   UHRSWORKT                     — usual hours worked per week
-#   WKSWORK2                      — weeks worked last year (bracketed)
-#   INCWAGE                       — wage and salary income
+# How the extract was obtained:
+#   1. Registered for IPUMS CPS at https://uma.pop.umn.edu/cps/registration/new
+#   2. Went to https://cps.ipums.org/cps/ and clicked "Get Data"
+#   3. Selected samples: March ASEC for each year 2010–2024 (Cross-sectional)
+#   4. Selected variables:
+#        Preselected : YEAR, MONTH, SERIAL, PERNUM, HWTFINL, CPSID, ASECFLAG,
+#                      HFLAG, ASECWTH, CPSIDP, CPSIDV, ASECWT, WTFINL
+#        Added       : STATEFIP, AGE, SEX, EMPSTAT, LABFORCE, UHRSWORKT,
+#                      WKSWORK2, INCWAGE
+#   5. Clicked "View Cart" → "Create Data Extract"
+#   6. Set data format to CSV
+#   7. Used description: "IDS701 minimum wage border county project - March ASEC 2010-2024"
+#   8. Clicked "Submit Extract" — received email when ready
+#   9. Downloaded files and saved to: data/raw/cps/
 #
-# Requires an IPUMS API key. Set it as an environment variable:
-#   export IPUMS_API_KEY="your_key_here"
-# or pass it directly when prompted.
-
-CPS_SAMPLES = [f"cps{yr}_03s" for yr in range(FIRST_YEAR, LAST_YEAR + 1)]
-CPS_VARIABLES = [
-    "YEAR",
-    "MONTH",
-    "SERIAL",
-    "PERNUM",
-    "WTFINL",
-    "STATEFIP",
-    "AGE",
-    "SEX",
-    "EMPSTAT",
-    "LABFORCE",
-    "UHRSWORKT",
-    "WKSWORK2",
-    "INCWAGE",
-]
-
-
-def download_cps() -> None:
-    from ipumspy import IpumsApiClient, MicrodataExtract
-
-    print("\n=== IPUMS CPS (March ASEC, all states, 2010–2024) ===")
-
-    # Check if already downloaded
-    existing = (
-        list(RAW_CPS.glob("*.dat.gz"))
-        + list(RAW_CPS.glob("*.csv.gz"))
-        + list(RAW_CPS.glob("*.xml"))
-    )
-    if existing:
-        print(f"  [skip] CPS files already exist in {RAW_CPS}")
-        return
-
-    # Get API key from .env or prompt
-    api_key = (
-        os.environ.get("IPUMS_API_KEY") or input("  Enter your IPUMS API key: ").strip()
-    )
-    if not api_key:
-        print("  [skip] No API key provided — skipping CPS download")
-        return
-
-    ipums = IpumsApiClient(api_key)
-
-    print(
-        f"  Submitting extract: {len(CPS_SAMPLES)} samples, {len(CPS_VARIABLES)} variables..."
-    )
-    extract = MicrodataExtract(
-        collection="cps",
-        samples=CPS_SAMPLES,
-        variables=CPS_VARIABLES,
-        description="IDS701 minimum wage project — March ASEC 2010-2024",
-    )
-    ipums.submit_extract(extract)
-    print(f"  [submitted] Extract #{extract.extract_id}. Waiting for completion...")
-
-    ipums.wait_for_extract(extract, timeout=1800)  # wait up to 30 min
-
-    print(f"  [ready] Downloading extract #{extract.extract_id}...")
-    ipums.download_extract(extract, download_dir=RAW_CPS)
-    print(f"  [done] CPS files saved to {RAW_CPS}")
+# Create a free account at https://ipums.org, register for CPS, and
+# repeat steps 2–9 above to obtain the same extract.
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     download_qcew()
     download_min_wage()
-    download_cps()
-    print("\nAll downloads complete.")
+    print("\nAll downloads complete. Note: CPS data must be downloaded manually.")
+    print("See instructions in the source code above (section 3) or README.")
