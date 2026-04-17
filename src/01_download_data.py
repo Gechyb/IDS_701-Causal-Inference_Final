@@ -40,6 +40,8 @@ RAW_QCEW = ROOT / "data" / "raw" / "qcew"
 RAW_MIN_WAGE = ROOT / "data" / "raw" / "min_wage"
 RAW_CPS = ROOT / "data" / "raw" / "cps"
 
+RAW_STATE_FIPS = ROOT / "data" / "raw" / "state_fips.txt"
+
 RAW_QCEW.mkdir(parents=True, exist_ok=True)
 RAW_MIN_WAGE.mkdir(parents=True, exist_ok=True)
 RAW_CPS.mkdir(parents=True, exist_ok=True)
@@ -225,9 +227,25 @@ def download_min_wage() -> None:
 # repeat steps 2–9 above to obtain the same extract.
 
 
+# 4. Census Bureau state FIPS table
+# Official pipe-delimited file from the Census Bureau.
+# Columns: STATE (2-digit FIPS), STUSAB (2-letter abbr), STATE_NAME, STATENS
+# Covers all 50 states + DC + territories.
+# Used in cleaning notebooks to map state abbreviations → FIPS codes without
+# hardcoding the lookup table.
+
+STATE_FIPS_URL = "https://www2.census.gov/geo/docs/reference/state.txt"
+
+
+def download_state_fips() -> None:
+    print("\n=== Census Bureau state FIPS table ===")
+    download_file(STATE_FIPS_URL, RAW_STATE_FIPS)
+
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     download_qcew()
     download_min_wage()
+    download_state_fips()
     print("\nAll downloads complete. Note: CPS data must be downloaded manually.")
     print("See instructions in the source code above (section 3) or README.")
