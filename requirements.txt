@@ -4,3 +4,4 @@ beautifulsoup4
 ipumspy
 pandas
 numpy
+pyarrow
