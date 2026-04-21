@@ -209,9 +209,6 @@ __marimo__/
 # Raw data — too large for git; teammates download using src/01_download_data.py
 data/raw/
 
-# Processed outputs — large files excluded
-data/processed/
-
 # Intermediate parquet files are small enough to commit
 # data/intermediate/ is tracked
 
