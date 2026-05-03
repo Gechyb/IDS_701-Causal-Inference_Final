@@ -23,6 +23,8 @@ This project estimates the causal effect of state minimum wage increases on empl
 │   ├── 09_cps_heterogeneity.ipynb
 │   ├── 10_flowcharts.ipynb
 │   └── 11_early_period_2004_2010.ipynb
+├── docs/
+│   └── policy_implementation_framework.md  # Stakeholder-facing implementation and monitoring guidance
 ├── data/
 │   ├── raw/                    # Downloaded source files (not tracked in git)
 │   ├── intermediate/           # Cleaned single-source parquet files
@@ -63,6 +65,12 @@ Generates two schematic figures illustrating the data pipeline (from raw sources
 
 **11_early_period_2004_2010.ipynb**
 Isolates the 2004 to 2010 sub-period to leverage the federal minimum wage hikes of 2007 to 2009 ($5.15 to $7.25) as an exogenous shock. Compares full-panel, pre-recession, and recession-era estimates to show results are not driven by the Great Recession. Approximately 94% of treatment events in the sample fall within this window.
+
+---
+
+## Policy Translation
+
+In addition to the empirical analysis, this repository includes a stakeholder-facing policy implementation framework in `docs/policy_implementation_framework.md`. This document translates the project findings into monitoring indicators, trigger points, and recommended actions for labor agencies, workforce boards, employers, and local policymakers.
 
 ---
 
