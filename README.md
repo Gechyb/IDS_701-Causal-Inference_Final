@@ -50,13 +50,13 @@ Identifies contiguous cross-state county pairs using the Census Bureau county ad
 Merges QCEW employment, minimum wage, and border pair datasets into the analysis-ready panel. Drops invalid state-years (AZ 2003-2006, FL 2003-2005, GA 2024, WY 2024) rather than imputing, filters to border counties, log-transforms outcomes, assigns treatment indicators (higher-wage state = treated), drops BLS-suppressed observations, and saves `data/processed/analysis_panel.parquet` with approximately 157,000 county-by-year-by-industry-by-pair observations.
 
 **07_did_model_setup.ipynb**
-Runs the main two-way fixed effects DiD specification with county fixed effects and pair-by-year fixed effects. Estimates the effect of minimum wage on log employment and log average weekly wages for the full nationwide border-county sample, and for a smaller four-border illustrative subsample (NJ/PA, MN/WI, NY/PA, CA/NV). Reports strong wage pass-through and small, statistically imprecise employment effects in NAICS 722.
+Runs the main two-way fixed effects DiD specification with county fixed effects and pair-by-year fixed effects. Estimates the effect of minimum wage on log employment and log average weekly wages for the full nationwide border-county sample, and for a smaller four-border illustrative subsample (NJ/PA, MN/WI, NY/PA, CA/NV). Reports strong wage pass-through and small, statistically imprecise employment effects in NAICS 722, with an additional signed dollar-gap robustness check.
 
 **08_event_study.ipynb**
 Tests the parallel pre-trends assumption using an event study. Identifies the first year a minimum wage gap opens within each border pair, constructs relative-time indicators, and runs a TWFE regression with leads and lags. Pre-treatment coefficients near zero support the parallel trends assumption; post-treatment coefficients show the dynamic employment response.
 
 **09_cps_heterogeneity.ipynb**
-Estimates minimum wage employment effects separately by age group and gender using state-level CPS data merged with state minimum wages. Young adults aged 20 to 24 show a statistically significant negative effect (β = −0.028, p = 0.046), driven primarily by young men. Teens aged 16 to 19 show a marginally significant positive effect. Older workers and gender breakdowns show near-zero effects. This analysis covers 2004 to 2024 and uses a state-level panel rather than the border-county design.
+Estimates minimum wage employment effects separately by age group and gender using state-level CPS data merged with state minimum wages. Young adults aged 20 to 24 show a statistically significant negative effect (β = −0.028, p = 0.046), driven primarily by young men. Teens aged 16 to 19 show a marginally significant positive effect. Older workers and gender breakdowns show near-zero effects. The notebook also checks whether young adults adjust through usual weekly hours and whether the age-group results are driven by very small CPS state-year cells. This analysis covers 2004 to 2024 and uses a state-level panel rather than the border-county design.
 
 **10_flowcharts.ipynb**
 Generates two schematic figures illustrating the data pipeline (from raw sources through cleaning to estimation) and the identification strategy (border-county design, parallel trends test, TWFE specification).
@@ -78,7 +78,39 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Download Raw Data
+### 2. Quick Path: Reproduce Analysis from Included Processed Data
+
+The repository includes the cleaned intermediate files and final analysis panel needed
+for the report:
+
+- `data/intermediate/qcew_panel.parquet`
+- `data/intermediate/min_wage_panel.parquet`
+- `data/intermediate/border_pairs.parquet`
+- `data/intermediate/cps_clean.parquet`
+- `data/intermediate/cps_panel.parquet`
+- `data/processed/analysis_panel.parquet`
+
+To reproduce the tables and figures used in the report, open Jupyter and run the
+analysis notebooks from 07 onward:
+
+```bash
+jupyter notebook
+```
+
+Recommended order:
+
+1. `notebooks/07_did_model_setup.ipynb`
+2. `notebooks/08_event_study.ipynb`
+3. `notebooks/09_cps_heterogeneity.ipynb`
+4. `notebooks/10_flowcharts.ipynb`
+5. `notebooks/11_early_period_2004_2010.ipynb`
+
+This path does not require downloading the raw QCEW or CPS files.
+
+### 3. Optional Full Data Rebuild from Raw Sources
+
+Use this path only if you want to rebuild the intermediate and processed data files
+from the original sources.
 
 Most raw data is downloaded automatically by running:
 
@@ -97,7 +129,7 @@ This script fetches:
 - **Census Bureau state FIPS table** to `data/raw/state_fips.txt`.
   Source: https://www2.census.gov/geo/docs/reference/state.txt
 
-### 3. Download CPS Data Manually (Required for Notebooks 04 and 09)
+### 4. Download CPS Data Manually for Full Rebuild
 
 The IPUMS CPS extract must be obtained manually:
 
@@ -109,9 +141,12 @@ The IPUMS CPS extract must be obtained manually:
 5. Set the data format to CSV, submit the extract, and wait for the confirmation email.
 6. Download the resulting CSV and DDI (codebook) files and save them to `data/raw/cps/`.
 
-### 4. Run the Notebooks
+### 5. Run the Full Pipeline
 
-Run the notebooks in order from 02 through 11. Each notebook reads from `data/raw/` or `data/intermediate/` and writes outputs for the next stage. Notebooks 07 through 11 read from `data/processed/analysis_panel.parquet` produced by notebook 06.
+After the raw files are in place, run the notebooks in order from 02 through 11.
+Each notebook reads from `data/raw/` or `data/intermediate/` and writes outputs
+for the next stage. Notebooks 07 through 11 read from
+`data/processed/analysis_panel.parquet` produced by notebook 06.
 
 ```bash
 jupyter notebook
