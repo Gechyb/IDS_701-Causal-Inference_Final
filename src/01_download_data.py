@@ -5,9 +5,8 @@ Sources:
 1. QCEW (BLS) – county-level annual bulk ZIP files (all states, all available years)
    https://www.bls.gov/cew/downloadable-data.htm
    BLS publishes one ZIP per year; each ZIP contains CSVs for every county in the US.
-   Years are fixed at 2010–2024: 2010 is chosen because the federal minimum wage last
-   changed in 2009, making state-level divergence meaningful only from 2010 onward;
-   2024 is the latest year with published annual data (2025 not yet released by BLS).
+   Years are fixed at 2004–2024; 2024 is the latest year with published annual data
+   (2025 not yet released by BLS).
    State/year filtering for the analysis happens in a later cleaning script.
 
 2. State minimum wage history (FRED, Federal Reserve Bank of St. Louis)
@@ -75,9 +74,7 @@ def qcew_url(year: int) -> str:
 
 # 1. QCEW county-level annual bulk files
 
-FIRST_YEAR = (
-    2010  # federal minimum wage last changed in 2009; state divergence begins here
-)
+FIRST_YEAR = 2004
 LAST_YEAR = 2024  # 2025 annual data not yet published by BLS
 
 
