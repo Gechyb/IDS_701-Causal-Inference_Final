@@ -47,7 +47,7 @@ Cleans the IPUMS CPS March ASEC supplement (manually downloaded, see below) to p
 Identifies contiguous cross-state county pairs using the Census Bureau county adjacency file, merges minimum wage history onto each pair, and retains only pairs where the two states had different minimum wages in at least one year between 2004 and 2024. Outputs `data/intermediate/border_pairs.parquet` with 1,132 pairs across 49 states.
 
 **06_build_panel.ipynb**
-Merges QCEW employment, minimum wage, and border pair datasets into the analysis-ready panel. Imputes missing state-years to the federal floor, filters to border counties, log-transforms outcomes, assigns treatment indicators (higher-wage state = treated), drops BLS-suppressed observations, and saves `data/processed/analysis_panel.parquet` with approximately 157,000 county-by-year-by-industry-by-pair observations.
+Merges QCEW employment, minimum wage, and border pair datasets into the analysis-ready panel. Drops invalid state-years (AZ 2003-2006, FL 2003-2005, GA 2024, WY 2024) rather than imputing, filters to border counties, log-transforms outcomes, assigns treatment indicators (higher-wage state = treated), drops BLS-suppressed observations, and saves `data/processed/analysis_panel.parquet` with approximately 157,000 county-by-year-by-industry-by-pair observations.
 
 **07_did_model_setup.ipynb**
 Runs the main two-way fixed effects DiD specification with county fixed effects and pair-by-year fixed effects. Estimates the effect of minimum wage on log employment and log average weekly wages for the full nationwide border-county sample, and for a smaller four-border illustrative subsample (NJ/PA, MN/WI, NY/PA, CA/NV). Reports strong wage pass-through and small, statistically imprecise employment effects in NAICS 722.
@@ -56,7 +56,7 @@ Runs the main two-way fixed effects DiD specification with county fixed effects 
 Tests the parallel pre-trends assumption using an event study. Identifies the first year a minimum wage gap opens within each border pair, constructs relative-time indicators, and runs a TWFE regression with leads and lags. Pre-treatment coefficients near zero support the parallel trends assumption; post-treatment coefficients show the dynamic employment response.
 
 **09_cps_heterogeneity.ipynb**
-Estimates minimum wage employment effects separately by age group and gender using state-level CPS data merged with state minimum wages. Young adults (20 to 24) show a statistically significant negative effect; teens and older workers show imprecise or near-zero effects. This analysis uses a state-level panel rather than the border-county design.
+Estimates minimum wage employment effects separately by age group and gender using state-level CPS data merged with state minimum wages. Young adults aged 20 to 24 show a statistically significant negative effect (β = −0.028, p = 0.046), driven primarily by young men. Teens aged 16 to 19 show a marginally significant positive effect. Older workers and gender breakdowns show near-zero effects. This analysis covers 2004 to 2024 and uses a state-level panel rather than the border-county design.
 
 **10_flowcharts.ipynb**
 Generates two schematic figures illustrating the data pipeline (from raw sources through cleaning to estimation) and the identification strategy (border-county design, parallel trends test, TWFE specification).
@@ -103,7 +103,7 @@ The IPUMS CPS extract must be obtained manually:
 
 1. Register for a free account at https://ipums.org and apply for CPS access.
 2. Go to https://cps.ipums.org/cps/ and click "Get Data".
-3. Select samples: March ASEC for each year from 2010 to 2024 (cross-sectional).
+3. Select samples: March ASEC for each year from 2004 to 2024 (cross-sectional).
 4. Add the following variables (in addition to the preselected defaults):
    `STATEFIP`, `AGE`, `SEX`, `EMPSTAT`, `LABFORCE`, `UHRSWORKT`, `WKSWORK2`, `INCWAGE`
 5. Set the data format to CSV, submit the extract, and wait for the confirmation email.
