@@ -1,7 +1,20 @@
+# Data collection
 requests
 python-dotenv
 beautifulsoup4
 ipumspy
+
+# Data processing
 pandas
 numpy
 pyarrow
+
+# Modelling and statistics
+statsmodels
+
+# Visualisation
+matplotlib
+
+# Jupyter
+jupyter
+ipykernel
